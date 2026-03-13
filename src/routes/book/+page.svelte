@@ -8,6 +8,8 @@
 		type TripType,
 		type VehicleType
 	} from '$lib/stores/booking';
+	import DateInput from '$lib/components/DateInput.svelte';
+	import TimeInput from '$lib/components/TimeInput.svelte';
 	import {
 		Plane,
 		Car,
@@ -363,30 +365,8 @@
 				</div>
 
 				<!-- Date & Time -->
-				<div>
-					<label for="date" class="mb-2 block text-sm font-semibold text-navy-700">
-						<Calendar size={14} class="mb-0.5 mr-1 inline text-navy-400" />
-						日期
-					</label>
-					<input
-						id="date"
-						type="date"
-						bind:value={date}
-						class="box-border min-w-0 max-w-full w-full rounded-xl border border-navy-200 bg-white px-4 py-3.5 text-sm font-medium text-navy-900 transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none"
-					/>
-				</div>
-				<div>
-					<label for="time" class="mb-2 block text-sm font-semibold text-navy-700">
-						<Clock size={14} class="mb-0.5 mr-1 inline text-navy-400" />
-						時間
-					</label>
-					<input
-						id="time"
-						type="time"
-						bind:value={time}
-						class="box-border min-w-0 max-w-full w-full rounded-xl border border-navy-200 bg-white px-4 py-3.5 text-sm font-medium text-navy-900 transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none"
-					/>
-				</div>
+				<DateInput bind:value={date} label="日期" placeholder="選擇日期" />
+				<TimeInput bind:value={time} label="時間" placeholder="選擇時間" />
 
 				<!-- Flight Number (pickup only) -->
 				{#if tripType === 'pickup'}
