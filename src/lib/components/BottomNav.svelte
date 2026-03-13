@@ -16,7 +16,7 @@
 </script>
 
 <nav
-	class="absolute bottom-0 left-0 right-0 z-50 border-t border-navy-100 bg-white/95 backdrop-blur-md"
+	class="sticky bottom-0 left-0 right-0 z-50 shrink-0 border-t border-navy-100 bg-white/95 backdrop-blur-md"
 >
 	<div class="flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)] pt-1">
 		{#each tabs as tab (tab.href)}
