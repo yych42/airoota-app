@@ -24,21 +24,21 @@
 	});
 
 	// Scroll selected hour/minute into view when opening
-	$effect(() => {
-		if (open && hour) {
-			setTimeout(() => {
+	function scrollToSelected() {
+		setTimeout(() => {
+			if (hour) {
 				const el = document.getElementById(`hour-${hour}`);
-				el?.scrollIntoView({ block: 'center', behavior: 'instant' });
-			}, 0);
-		}
-	});
-	$effect(() => {
-		if (open && minute) {
-			setTimeout(() => {
+				el?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+			}
+			if (minute) {
 				const el = document.getElementById(`min-${minute}`);
-				el?.scrollIntoView({ block: 'center', behavior: 'instant' });
-			}, 0);
-		}
+				el?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+			}
+		}, 0);
+	}
+
+	$effect(() => {
+		if (open) scrollToSelected();
 	});
 
 	const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
@@ -84,17 +84,16 @@
 		}
 	}
 
-	// Group presets by period
 	const presets = [
-		{ time: '06:00', label: '6:00', period: 'dawn' as Period },
-		{ time: '08:00', label: '8:00', period: 'day' as Period },
-		{ time: '10:00', label: '10:00', period: 'day' as Period },
-		{ time: '12:00', label: '12:00', period: 'day' as Period },
-		{ time: '14:00', label: '14:00', period: 'day' as Period },
-		{ time: '16:00', label: '16:00', period: 'day' as Period },
-		{ time: '18:00', label: '18:00', period: 'dusk' as Period },
-		{ time: '20:00', label: '20:00', period: 'night' as Period },
-		{ time: '22:00', label: '22:00', period: 'night' as Period },
+		{ time: '06:00', label: '清晨 6:00', period: 'dawn' as Period },
+		{ time: '08:00', label: '上午 8:00', period: 'day' as Period },
+		{ time: '10:00', label: '上午 10:00', period: 'day' as Period },
+		{ time: '12:00', label: '中午 12:00', period: 'day' as Period },
+		{ time: '14:00', label: '下午 14:00', period: 'day' as Period },
+		{ time: '16:00', label: '下午 16:00', period: 'day' as Period },
+		{ time: '18:00', label: '傍晚 18:00', period: 'dusk' as Period },
+		{ time: '20:00', label: '晚上 20:00', period: 'night' as Period },
+		{ time: '22:00', label: '晚上 22:00', period: 'night' as Period },
 	];
 
 	function setHour(h: string) {
@@ -114,7 +113,8 @@
 		hour = h;
 		minute = m;
 		value = time;
-		open = false;
+		// Scroll to the selected hour/minute instead of closing
+		scrollToSelected();
 	}
 
 	let displayValue = $derived(
@@ -156,7 +156,7 @@
 						<button
 							type="button"
 							onclick={() => selectPreset(p.time)}
-							class="rounded-full px-3 py-1.5 text-xs font-medium font-mono tracking-wide transition-all
+							class="rounded-full px-3 py-1.5 text-xs font-medium transition-all
 								{selected
 									? 'bg-amber-500 text-white shadow-sm'
 									: `${periodBg(p.period, false)} text-navy-600 hover:brightness-95 active:brightness-90`}"
@@ -172,7 +172,7 @@
 				<!-- Hours -->
 				<div class="flex-1 border-r border-navy-100">
 					<div class="sticky top-0 bg-white px-3 pb-1 pt-2.5 text-[11px] font-semibold uppercase tracking-wider text-navy-400">時</div>
-					<div class="h-48 overflow-y-auto px-1.5 pb-2">
+					<div class="h-48 overflow-y-auto pb-1">
 						{#each hours as h}
 							{@const n = Number(h)}
 							{@const period = getPeriod(n)}
@@ -181,7 +181,7 @@
 								id="hour-{h}"
 								type="button"
 								onclick={() => setHour(h)}
-								class="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 transition-all {periodBg(period, selected)}
+								class="flex w-full items-center gap-2 px-3 py-2 transition-all {periodBg(period, selected)}
 									{selected ? '' : 'hover:brightness-95 active:brightness-90'}"
 							>
 								<span class="font-mono text-sm font-semibold tracking-wider {selected ? 'text-white' : 'text-navy-800'}">
@@ -198,14 +198,14 @@
 				<!-- Minutes -->
 				<div class="w-[5.5rem]">
 					<div class="sticky top-0 bg-white px-3 pb-1 pt-2.5 text-[11px] font-semibold uppercase tracking-wider text-navy-400">分</div>
-					<div class="h-48 overflow-y-auto px-1.5 pb-2">
+					<div class="h-48 overflow-y-auto pb-1">
 						{#each minutes as m}
 							{@const selected = minute === m}
 							<button
 								id="min-{m}"
 								type="button"
 								onclick={() => setMinute(m)}
-								class="w-full rounded-lg px-2.5 py-2 text-left font-mono text-sm font-semibold tracking-wider transition-all
+								class="w-full px-3 py-2 text-left font-mono text-sm font-semibold tracking-wider transition-all
 									{selected
 										? 'bg-amber-500 text-white'
 										: 'text-navy-700 hover:bg-navy-50 active:bg-navy-100'}"
