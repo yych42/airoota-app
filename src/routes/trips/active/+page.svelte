@@ -162,7 +162,7 @@
 </script>
 
 <svelte:head>
-	<title>行程詳情 — AiRoota</title>
+	<title>行程詳情 — Airoota</title>
 </svelte:head>
 
 <div class="page-transition flex flex-col">
@@ -630,7 +630,7 @@
 						<Check size={32} class="text-white" />
 					</div>
 					<h2 class="text-2xl font-bold text-navy-900">旅程完成！</h2>
-					<p class="mt-1 text-sm text-navy-500">感謝您選擇 AiRoota</p>
+					<p class="mt-1 text-sm text-navy-500">感謝您選擇 Airoota</p>
 				</div>
 
 				<div class="mb-5 rounded-2xl border border-navy-100 bg-white p-4 shadow-sm">

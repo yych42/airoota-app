@@ -91,7 +91,7 @@
 </script>
 
 <svelte:head>
-	<title>我的行程 — AiRoota</title>
+	<title>我的行程 — Airoota</title>
 </svelte:head>
 
 <div class="page-transition px-4 pt-6 pb-8">

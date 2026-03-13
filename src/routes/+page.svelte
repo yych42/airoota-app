@@ -19,7 +19,7 @@
 </script>
 
 <svelte:head>
-	<title>AiRoota — 機場接送，安心出發</title>
+	<title>Airoota — 機場接送，安心出發</title>
 	<meta name="description" content="專業機場接送服務，固定價格，即時航班追蹤" />
 </svelte:head>
 
@@ -33,7 +33,7 @@
 					<Plane class="h-5 w-5 text-amber-400" strokeWidth={2.2} />
 				</div>
 				<span class="text-xl font-bold tracking-tight text-white">
-					Ai<span class="text-amber-400">Roota</span>
+					Air<span class="text-amber-400">oota</span>
 				</span>
 			</div>
 			<button

@@ -27,7 +27,7 @@
 </script>
 
 <svelte:head>
-	<title>預訂成功 — AiRoota</title>
+	<title>預訂成功 — Airoota</title>
 </svelte:head>
 
 <div class="page-transition relative min-h-[calc(100dvh-5rem)] overflow-hidden px-4 pt-8 pb-8">

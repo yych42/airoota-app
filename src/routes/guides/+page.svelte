@@ -46,7 +46,7 @@
 </script>
 
 <svelte:head>
-	<title>機場指南 — AiRoota</title>
+	<title>機場指南 — Airoota</title>
 	<meta name="description" content="台灣主要機場接機指南，讓每次旅程都從容自在" />
 </svelte:head>
 

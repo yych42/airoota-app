@@ -27,7 +27,8 @@
 		Plus,
 		Minus,
 		Trash2,
-		Receipt
+		Receipt,
+		VolumeOff
 	} from 'lucide-svelte';
 
 	// ── Trip Type from URL ─────────────────────────────
@@ -56,6 +57,9 @@
 
 	// Receipt
 	let needsReceipt = $state(false);
+
+	// Quiet ride preference
+	let quietRide = $state(false);
 
 	// Vehicle & payment
 	let selectedVehicle = $state<VehicleType>('standard');
@@ -262,7 +266,7 @@
 </script>
 
 <svelte:head>
-	<title>預訂接送 — AiRoota</title>
+	<title>預訂接送 — Airoota</title>
 </svelte:head>
 
 <div class="page-transition px-4 pt-4 pb-8">
@@ -358,32 +362,30 @@
 					</div>
 				</div>
 
-				<!-- Date & Time Row -->
-				<div class="grid grid-cols-2 gap-3">
-					<div>
-						<label for="date" class="mb-2 block text-sm font-semibold text-navy-700">
-							<Calendar size={14} class="mb-0.5 mr-1 inline text-navy-400" />
-							日期
-						</label>
-						<input
-							id="date"
-							type="date"
-							bind:value={date}
-							class="w-full rounded-xl border border-navy-200 bg-white px-4 py-3.5 text-sm font-medium text-navy-900 transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none"
-						/>
-					</div>
-					<div>
-						<label for="time" class="mb-2 block text-sm font-semibold text-navy-700">
-							<Clock size={14} class="mb-0.5 mr-1 inline text-navy-400" />
-							時間
-						</label>
-						<input
-							id="time"
-							type="time"
-							bind:value={time}
-							class="w-full rounded-xl border border-navy-200 bg-white px-4 py-3.5 text-sm font-medium text-navy-900 transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none"
-						/>
-					</div>
+				<!-- Date & Time -->
+				<div>
+					<label for="date" class="mb-2 block text-sm font-semibold text-navy-700">
+						<Calendar size={14} class="mb-0.5 mr-1 inline text-navy-400" />
+						日期
+					</label>
+					<input
+						id="date"
+						type="date"
+						bind:value={date}
+						class="w-full rounded-xl border border-navy-200 bg-white px-4 py-3.5 text-sm font-medium text-navy-900 transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none"
+					/>
+				</div>
+				<div>
+					<label for="time" class="mb-2 block text-sm font-semibold text-navy-700">
+						<Clock size={14} class="mb-0.5 mr-1 inline text-navy-400" />
+						時間
+					</label>
+					<input
+						id="time"
+						type="time"
+						bind:value={time}
+						class="w-full rounded-xl border border-navy-200 bg-white px-4 py-3.5 text-sm font-medium text-navy-900 transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none"
+					/>
 				</div>
 
 				<!-- Flight Number (pickup only) -->
@@ -646,6 +648,29 @@
 				</button>
 			</div>
 
+			<!-- Divider -->
+			<div class="h-px bg-navy-100"></div>
+
+			<!-- ── Section: Quiet Ride ── -->
+			<div class="flex items-center justify-between">
+				<div>
+					<h2 class="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-navy-500">
+						<VolumeOff size={14} class="text-navy-400" />
+						安靜乘車
+					</h2>
+					<p class="mt-1 text-xs text-navy-400">司機將不主動交談，讓您享受安靜旅程</p>
+				</div>
+				<button
+					onclick={() => (quietRide = !quietRide)}
+					aria-label="安靜乘車"
+					class="relative h-7 w-12 rounded-full transition-colors duration-200 {quietRide ? 'bg-amber-500' : 'bg-navy-200'}"
+				>
+					<span
+						class="absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white shadow-sm transition-transform duration-200 {quietRide ? 'translate-x-5' : 'translate-x-0'}"
+					></span>
+				</button>
+			</div>
+
 			<!-- Continue Button -->
 			<button
 				onclick={() => goToStep(2)}
@@ -883,6 +908,17 @@
 								<div>
 									<p class="text-xs text-navy-500">統一發票</p>
 									<p class="text-sm font-semibold text-navy-900">需要紙本發票</p>
+								</div>
+							</div>
+						{/if}
+
+						<!-- Quiet Ride -->
+						{#if quietRide}
+							<div class="flex items-start gap-3">
+								<VolumeOff size={16} class="mt-0.5 flex-shrink-0 text-navy-400" />
+								<div>
+									<p class="text-xs text-navy-500">乘車偏好</p>
+									<p class="text-sm font-semibold text-navy-900">安靜乘車</p>
 								</div>
 							</div>
 						{/if}

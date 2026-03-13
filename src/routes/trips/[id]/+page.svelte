@@ -114,7 +114,7 @@
 </script>
 
 <svelte:head>
-	<title>{trip ? `行程 ${trip.airport.code}` : '行程詳情'} — AiRoota</title>
+	<title>{trip ? `行程 ${trip.airport.code}` : '行程詳情'} — Airoota</title>
 </svelte:head>
 
 <div class="page-transition flex flex-col pb-8">

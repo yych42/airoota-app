@@ -150,8 +150,8 @@
 </script>
 
 <svelte:head>
-	<title>客服中心 — AiRoota</title>
-	<meta name="description" content="AiRoota 客服中心，我們隨時為您提供協助" />
+	<title>客服中心 — Airoota</title>
+	<meta name="description" content="Airoota 客服中心，我們隨時為您提供協助" />
 </svelte:head>
 
 <div class="page-transition min-h-screen bg-white">

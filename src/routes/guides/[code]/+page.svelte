@@ -125,7 +125,7 @@
 </script>
 
 <svelte:head>
-	<title>{airport.name} 指南 — AiRoota</title>
+	<title>{airport.name} 指南 — Airoota</title>
 	<meta name="description" content="{airport.name}接機指南，找到您的司機" />
 </svelte:head>
 

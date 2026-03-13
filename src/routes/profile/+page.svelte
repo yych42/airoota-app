@@ -30,7 +30,7 @@
 </script>
 
 <svelte:head>
-	<title>個人資料 — AiRoota</title>
+	<title>個人資料 — Airoota</title>
 	<meta name="description" content="管理您的個人資料與偏好設定" />
 </svelte:head>
 
