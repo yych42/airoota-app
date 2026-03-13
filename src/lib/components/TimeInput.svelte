@@ -11,7 +11,6 @@
 		placeholder?: string;
 	} = $props();
 
-	// Parse HH:MM string
 	let hour = $state('');
 	let minute = $state('');
 	let open = $state(false);
@@ -24,13 +23,44 @@
 		}
 	});
 
-	const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
-	const minutes = ['00', '15', '30', '45'];
+	// Scroll selected hour/minute into view when opening
+	$effect(() => {
+		if (open && hour) {
+			setTimeout(() => {
+				const el = document.getElementById(`hour-${hour}`);
+				el?.scrollIntoView({ block: 'center', behavior: 'instant' });
+			}, 0);
+		}
+	});
+	$effect(() => {
+		if (open && minute) {
+			setTimeout(() => {
+				const el = document.getElementById(`min-${minute}`);
+				el?.scrollIntoView({ block: 'center', behavior: 'instant' });
+			}, 0);
+		}
+	});
 
-	function selectTime(h: string, m: string) {
+	const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+	const minutes = Array.from({ length: 12 }, (_, i) => String(i * 5).padStart(2, '0'));
+
+	function setHour(h: string) {
+		hour = h;
+		value = `${h}:${minute || '00'}`;
+		if (!minute) minute = '00';
+	}
+
+	function setMinute(m: string) {
+		minute = m;
+		value = `${hour || '00'}:${m}`;
+		if (!hour) hour = '00';
+	}
+
+	function selectPreset(time: string) {
+		const [h, m] = time.split(':');
 		hour = h;
 		minute = m;
-		value = `${h}:${m}`;
+		value = time;
 		open = false;
 	}
 
@@ -44,6 +74,18 @@
 			open = false;
 		}
 	}
+
+	const presets = [
+		{ time: '06:00', label: '早班 6:00' },
+		{ time: '08:00', label: '上午 8:00' },
+		{ time: '10:00', label: '上午 10:00' },
+		{ time: '12:00', label: '中午 12:00' },
+		{ time: '14:00', label: '下午 2:00' },
+		{ time: '16:00', label: '下午 4:00' },
+		{ time: '18:00', label: '傍晚 6:00' },
+		{ time: '20:00', label: '晚上 8:00' },
+		{ time: '22:00', label: '晚上 10:00' },
+	];
 </script>
 
 <svelte:window onclick={handleClickOutside} />
@@ -64,55 +106,63 @@
 	</button>
 
 	{#if open}
-		<div class="absolute left-0 right-0 top-full z-[100] mt-2 rounded-2xl border border-navy-100 bg-white p-3 shadow-xl shadow-navy-900/10">
+		<div class="absolute left-0 right-0 top-full z-[100] mt-2 overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-xl shadow-navy-900/10">
 			<!-- Quick presets -->
-			<div class="mb-3">
-				<p class="mb-2 text-xs font-medium text-navy-400">常用時間</p>
+			<div class="border-b border-navy-100 px-4 py-3">
 				<div class="flex flex-wrap gap-1.5">
-					{#each ['06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'] as preset}
+					{#each presets as p}
 						<button
 							type="button"
-							onclick={() => { const [h, m] = preset.split(':'); selectTime(h, m); }}
-							class="rounded-lg px-3 py-1.5 text-xs font-medium transition-all
-								{value === preset ? 'bg-amber-500 text-white' : 'bg-navy-50 text-navy-700 hover:bg-navy-100 active:bg-navy-200'}"
+							onclick={() => selectPreset(p.time)}
+							class="rounded-full px-3 py-1.5 text-xs font-medium transition-all
+								{value === p.time
+									? 'bg-amber-500 text-white shadow-sm'
+									: 'bg-navy-50 text-navy-600 hover:bg-navy-100 active:bg-navy-200'}"
 						>
-							{preset}
+							{p.label}
 						</button>
 					{/each}
 				</div>
 			</div>
 
-			<div class="h-px bg-navy-100"></div>
-
-			<!-- Hour/Minute grid -->
-			<div class="mt-3 flex gap-3">
-				<!-- Hours column -->
-				<div class="flex-1">
-					<p class="mb-1.5 text-center text-xs font-medium text-navy-400">時</p>
-					<div class="grid max-h-40 grid-cols-4 gap-1 overflow-y-auto">
+			<!-- Hour & Minute columns -->
+			<div class="flex">
+				<!-- Hours -->
+				<div class="flex-1 border-r border-navy-100">
+					<div class="sticky top-0 bg-white px-3 pb-1 pt-2 text-xs font-semibold text-navy-400">時</div>
+					<div class="h-48 overflow-y-auto px-2 pb-2">
 						{#each hours as h}
 							<button
+								id="hour-{h}"
 								type="button"
-								onclick={() => selectTime(h, minute || '00')}
-								class="rounded-md py-1.5 text-center text-xs font-medium transition-all
-									{hour === h ? 'bg-amber-500 text-white' : 'text-navy-700 hover:bg-navy-50 active:bg-navy-100'}"
+								onclick={() => setHour(h)}
+								class="w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-all
+									{hour === h
+										? 'bg-amber-50 text-amber-700 font-semibold'
+										: 'text-navy-700 hover:bg-navy-50 active:bg-navy-100'}"
 							>
 								{h}
+								<span class="ml-1 text-xs text-navy-300">
+									{Number(h) < 6 ? '凌晨' : Number(h) < 12 ? '上午' : Number(h) < 18 ? '下午' : '晚上'}
+								</span>
 							</button>
 						{/each}
 					</div>
 				</div>
 
-				<!-- Minutes column -->
-				<div class="w-16">
-					<p class="mb-1.5 text-center text-xs font-medium text-navy-400">分</p>
-					<div class="flex flex-col gap-1">
+				<!-- Minutes -->
+				<div class="w-24">
+					<div class="sticky top-0 bg-white px-3 pb-1 pt-2 text-xs font-semibold text-navy-400">分</div>
+					<div class="h-48 overflow-y-auto px-2 pb-2">
 						{#each minutes as m}
 							<button
+								id="min-{m}"
 								type="button"
-								onclick={() => selectTime(hour || '00', m)}
-								class="rounded-md py-1.5 text-center text-xs font-medium transition-all
-									{minute === m ? 'bg-amber-500 text-white' : 'text-navy-700 hover:bg-navy-50 active:bg-navy-100'}"
+								onclick={() => setMinute(m)}
+								class="w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-all
+									{minute === m
+										? 'bg-amber-50 text-amber-700 font-semibold'
+										: 'text-navy-700 hover:bg-navy-50 active:bg-navy-100'}"
 							>
 								{m}
 							</button>
@@ -120,6 +170,19 @@
 					</div>
 				</div>
 			</div>
+
+			<!-- Confirm -->
+			{#if hour && minute}
+				<div class="border-t border-navy-100 px-4 py-3">
+					<button
+						type="button"
+						onclick={() => (open = false)}
+						class="w-full rounded-xl bg-amber-500 py-2.5 text-sm font-bold text-white transition-all hover:bg-amber-600 active:scale-[0.98]"
+					>
+						確認 {hour}:{minute}
+					</button>
+				</div>
+			{/if}
 		</div>
 	{/if}
 </div>
