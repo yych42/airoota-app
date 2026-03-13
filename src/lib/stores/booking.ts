@@ -121,6 +121,22 @@ function createBookingStore() {
 
 export const currentBooking = createBookingStore();
 
+// Default active booking for demo purposes
+export const defaultActiveBooking: Booking = {
+	id: 'b-active-demo',
+	tripType: 'pickup',
+	airport: airports[0],
+	address: '台北市信義區信義路五段7號',
+	date: '2026-03-13',
+	time: '14:30',
+	flightNumber: 'BR872',
+	vehicle: vehicles[0],
+	price: 1200,
+	state: 'en-route',
+	driver: mockDriver,
+	paymentMethod: 'credit-card'
+};
+
 // Demo upcoming bookings
 export const upcomingBookings = writable<Booking[]>([
 	{

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import {
 		currentBooking,
+		defaultActiveBooking,
 		pastBookings,
 		upcomingBookings,
 		type Booking,
@@ -18,12 +19,12 @@
 	} from 'lucide-svelte';
 
 	// Read store values reactively
-	let activeBooking: Booking | null = $state(null);
+	let storeBooking: Booking | null = $state(null);
 	let upcoming: Booking[] = $state([]);
 	let past: Booking[] = $state([]);
 
 	$effect(() => {
-		const unsub1 = currentBooking.subscribe((v) => (activeBooking = v));
+		const unsub1 = currentBooking.subscribe((v) => (storeBooking = v));
 		const unsub2 = upcomingBookings.subscribe((v) => (upcoming = v));
 		const unsub3 = pastBookings.subscribe((v) => (past = v));
 		return () => {
@@ -32,6 +33,9 @@
 			unsub3();
 		};
 	});
+
+	// Use store booking if available, otherwise fall back to default demo booking
+	let activeBooking = $derived(storeBooking ?? defaultActiveBooking);
 
 	function isActiveTrip(b: Booking | null): boolean {
 		return b !== null && b.state !== 'completed';

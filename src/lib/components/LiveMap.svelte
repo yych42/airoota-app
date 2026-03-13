@@ -11,6 +11,8 @@
 		destLabel?: string;
 		routeColor?: string;
 		animateDriver?: boolean;
+		/** How far along the route the driver is (0 to 1) */
+		driverProgress?: number;
 	}
 
 	let {
@@ -21,158 +23,204 @@
 		driverLabel = '司機',
 		destLabel = '目的地',
 		routeColor = '#f0b429',
-		animateDriver = true
+		animateDriver = true,
+		driverProgress = 0.15
 	}: Props = $props();
 
 	let mapEl: HTMLDivElement;
 	let map: L.Map | null = null;
 	let driverMarker: L.Marker | null = null;
-	let routeLine: L.Polyline | null = null;
-
-	// Generate a curved route between two points (mock waypoints)
-	function generateRoute(
-		startLat: number, startLng: number,
-		endLat: number, endLng: number
-	): [number, number][] {
-		const points: [number, number][] = [];
-		const steps = 30;
-		const midLat = (startLat + endLat) / 2;
-		const midLng = (startLng + endLng) / 2;
-		// Offset the midpoint to create a curve
-		const offsetLat = (endLng - startLng) * 0.15;
-		const offsetLng = -(endLat - startLat) * 0.15;
-
-		for (let i = 0; i <= steps; i++) {
-			const t = i / steps;
-			// Quadratic bezier
-			const lat = (1 - t) * (1 - t) * startLat + 2 * (1 - t) * t * (midLat + offsetLat) + t * t * endLat;
-			const lng = (1 - t) * (1 - t) * startLng + 2 * (1 - t) * t * (midLng + offsetLng) + t * t * endLng;
-			points.push([lat, lng]);
-		}
-		return points;
-	}
 
 	onMount(() => {
 		let cleanup: (() => void) | undefined;
 
 		(async () => {
-		const leaflet = await import('leaflet');
+			const leaflet = await import('leaflet');
 
-		// Create map
-		map = leaflet.map(mapEl, {
-			zoomControl: false,
-			attributionControl: false,
-			dragging: true,
-			scrollWheelZoom: false,
-			doubleClickZoom: false,
-			touchZoom: true
-		});
-
-		// Use CartoDB Voyager tiles (clean, modern look, free)
-		leaflet.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-			maxZoom: 18,
-			subdomains: 'abcd'
-		}).addTo(map);
-
-		// Custom driver icon
-		const driverIcon = leaflet.divIcon({
-			className: '',
-			html: `<div style="
-				width: 40px; height: 40px;
-				background: #102a43;
-				border-radius: 50%;
-				display: flex; align-items: center; justify-content: center;
-				box-shadow: 0 2px 8px rgba(16,42,67,0.4);
-				border: 3px solid white;
-				font-size: 18px;
-			">🚗</div>`,
-			iconSize: [40, 40],
-			iconAnchor: [20, 20]
-		});
-
-		// Custom destination icon
-		const destIcon = leaflet.divIcon({
-			className: '',
-			html: `<div style="
-				width: 36px; height: 36px;
-				background: ${routeColor === '#27ab83' ? '#27ab83' : '#f0b429'};
-				border-radius: 50%;
-				display: flex; align-items: center; justify-content: center;
-				box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-				border: 3px solid white;
-			">
-				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-					<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-					<circle cx="12" cy="10" r="3"/>
-				</svg>
-			</div>`,
-			iconSize: [36, 36],
-			iconAnchor: [18, 18]
-		});
-
-		// Add route line
-		const routePoints = generateRoute(driverLat, driverLng, destLat, destLng);
-		routeLine = leaflet.polyline(routePoints, {
-			color: routeColor,
-			weight: 4,
-			opacity: 0.8,
-			dashArray: '10, 6',
-			lineCap: 'round'
-		}).addTo(map);
-
-		// Add destination marker
-		leaflet.marker([destLat, destLng], { icon: destIcon })
-			.addTo(map)
-			.bindTooltip(destLabel, {
-				permanent: true,
-				direction: 'top',
-				offset: [0, -22],
-				className: 'map-tooltip'
+			map = leaflet.map(mapEl, {
+				zoomControl: false,
+				attributionControl: false,
+				dragging: true,
+				scrollWheelZoom: false,
+				doubleClickZoom: false,
+				touchZoom: true
 			});
 
-		// Add driver marker
-		driverMarker = leaflet.marker([driverLat, driverLng], { icon: driverIcon })
-			.addTo(map)
-			.bindTooltip(driverLabel, {
-				permanent: true,
-				direction: 'top',
-				offset: [0, -24],
-				className: 'map-tooltip'
-			});
+			leaflet.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+				maxZoom: 18,
+				subdomains: 'abcd'
+			}).addTo(map);
 
-		// Fit bounds to show both markers
-		const bounds = leaflet.latLngBounds(
-			[driverLat, driverLng],
-			[destLat, destLng]
-		);
-		map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
-
-		// Animate driver along route
-		if (animateDriver && routePoints.length > 0) {
-			let idx = 0;
-			const direction = { forward: true };
-			const interval = setInterval(() => {
-				if (!driverMarker) return;
-				if (direction.forward) {
-					idx++;
-					if (idx >= routePoints.length - 1) direction.forward = false;
-				} else {
-					idx--;
-					if (idx <= 0) direction.forward = true;
+			// Fetch real road route from OSRM
+			let routePoints: [number, number][] = [];
+			try {
+				const res = await fetch(
+					`https://router.project-osrm.org/route/v1/driving/${driverLng},${driverLat};${destLng},${destLat}?overview=full&geometries=geojson`
+				);
+				const data = await res.json();
+				if (data.routes && data.routes.length > 0) {
+					// GeoJSON coordinates are [lng, lat], Leaflet needs [lat, lng]
+					routePoints = data.routes[0].geometry.coordinates.map(
+						(c: [number, number]) => [c[1], c[0]] as [number, number]
+					);
 				}
-				const point = routePoints[idx];
-				driverMarker.setLatLng(point);
-			}, 200);
+			} catch {
+				// Fallback: straight line if OSRM fails
+				routePoints = [[driverLat, driverLng], [destLat, destLng]];
+			}
 
-			cleanup = () => {
-				clearInterval(interval);
-				map?.remove();
-			};
-		} else {
-			cleanup = () => {
-				map?.remove();
-			};
-		}
+			// Draw the full route as a faded background line
+			if (routePoints.length > 0) {
+				leaflet.polyline(routePoints, {
+					color: routeColor,
+					weight: 5,
+					opacity: 0.25,
+					lineCap: 'round',
+					lineJoin: 'round'
+				}).addTo(map);
+
+				// Draw the "already traveled" portion as a solid line
+				const progressIdx = Math.floor(routePoints.length * driverProgress);
+				const traveledPoints = routePoints.slice(0, Math.max(progressIdx, 1));
+				if (traveledPoints.length > 1) {
+					leaflet.polyline(traveledPoints, {
+						color: routeColor,
+						weight: 5,
+						opacity: 0.8,
+						lineCap: 'round',
+						lineJoin: 'round'
+					}).addTo(map);
+				}
+
+				// Draw the remaining portion as a dashed line
+				const remainingPoints = routePoints.slice(Math.max(progressIdx - 1, 0));
+				if (remainingPoints.length > 1) {
+					leaflet.polyline(remainingPoints, {
+						color: routeColor,
+						weight: 4,
+						opacity: 0.6,
+						dashArray: '8, 8',
+						lineCap: 'round',
+						lineJoin: 'round'
+					}).addTo(map);
+				}
+			}
+
+			// Custom driver icon
+			const driverIcon = leaflet.divIcon({
+				className: '',
+				html: `<div style="
+					width: 44px; height: 44px;
+					background: #102a43;
+					border-radius: 50%;
+					display: flex; align-items: center; justify-content: center;
+					box-shadow: 0 3px 12px rgba(16,42,67,0.5);
+					border: 3px solid white;
+					font-size: 20px;
+				">🚗</div>`,
+				iconSize: [44, 44],
+				iconAnchor: [22, 22]
+			});
+
+			// Custom destination icon
+			const destIcon = leaflet.divIcon({
+				className: '',
+				html: `<div style="
+					width: 36px; height: 36px;
+					background: ${routeColor === '#27ab83' ? '#27ab83' : '#f0b429'};
+					border-radius: 50%;
+					display: flex; align-items: center; justify-content: center;
+					box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+					border: 3px solid white;
+				">
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+						<circle cx="12" cy="10" r="3"/>
+					</svg>
+				</div>`,
+				iconSize: [36, 36],
+				iconAnchor: [18, 18]
+			});
+
+			// Origin icon (start of route)
+			const originIcon = leaflet.divIcon({
+				className: '',
+				html: `<div style="
+					width: 16px; height: 16px;
+					background: ${routeColor};
+					border-radius: 50%;
+					border: 3px solid white;
+					box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+				"></div>`,
+				iconSize: [16, 16],
+				iconAnchor: [8, 8]
+			});
+
+			// Add origin marker (start point)
+			leaflet.marker([driverLat, driverLng], { icon: originIcon }).addTo(map);
+
+			// Add destination marker
+			leaflet.marker([destLat, destLng], { icon: destIcon })
+				.addTo(map)
+				.bindTooltip(destLabel, {
+					permanent: true,
+					direction: 'top',
+					offset: [0, -22],
+					className: 'map-tooltip'
+				});
+
+			// Place driver at progress point along the route
+			let driverLatLng: [number, number] = [driverLat, driverLng];
+			if (routePoints.length > 1) {
+				const idx = Math.min(
+					Math.floor(routePoints.length * driverProgress),
+					routePoints.length - 1
+				);
+				driverLatLng = routePoints[idx];
+			}
+
+			driverMarker = leaflet.marker(driverLatLng, { icon: driverIcon, zIndexOffset: 1000 })
+				.addTo(map)
+				.bindTooltip(driverLabel, {
+					permanent: true,
+					direction: 'top',
+					offset: [0, -26],
+					className: 'map-tooltip'
+				});
+
+			// Fit bounds
+			const bounds = leaflet.latLngBounds(
+				[driverLat, driverLng],
+				[destLat, destLng]
+			);
+			map.fitBounds(bounds, { padding: [45, 45], maxZoom: 14 });
+
+			// Animate driver smoothly along remaining route
+			if (animateDriver && routePoints.length > 2) {
+				const startIdx = Math.floor(routePoints.length * driverProgress);
+				let currentIdx = startIdx;
+				const endIdx = routePoints.length - 1;
+
+				const interval = setInterval(() => {
+					if (!driverMarker || currentIdx >= endIdx) {
+						// Reset to start of progress section for loop
+						currentIdx = startIdx;
+					}
+					currentIdx++;
+					if (currentIdx < routePoints.length && driverMarker) {
+						driverMarker.setLatLng(routePoints[currentIdx]);
+					}
+				}, 350);
+
+				cleanup = () => {
+					clearInterval(interval);
+					map?.remove();
+				};
+			} else {
+				cleanup = () => {
+					map?.remove();
+				};
+			}
 		})();
 
 		return () => {
