@@ -1,0 +1,155 @@
+@import 'tailwindcss';
+
+@theme {
+	--font-sans: 'Inter', 'Noto Sans TC', system-ui, sans-serif;
+
+	--color-navy-50: #f0f4f8;
+	--color-navy-100: #d9e2ec;
+	--color-navy-200: #bcccdc;
+	--color-navy-300: #9fb3c8;
+	--color-navy-400: #829ab1;
+	--color-navy-500: #627d98;
+	--color-navy-600: #486581;
+	--color-navy-700: #334e68;
+	--color-navy-800: #243b53;
+	--color-navy-900: #102a43;
+	--color-navy-950: #0a1929;
+
+	--color-teal-50: #effcf6;
+	--color-teal-100: #c6f7e2;
+	--color-teal-200: #8eedc7;
+	--color-teal-300: #65d6ad;
+	--color-teal-400: #3ebd93;
+	--color-teal-500: #27ab83;
+	--color-teal-600: #199473;
+	--color-teal-700: #147d64;
+	--color-teal-800: #0c6b58;
+	--color-teal-900: #014d40;
+
+	--color-amber-50: #fffbea;
+	--color-amber-100: #fff3c4;
+	--color-amber-200: #fce588;
+	--color-amber-300: #fadb5f;
+	--color-amber-400: #f7c948;
+	--color-amber-500: #f0b429;
+	--color-amber-600: #de911d;
+	--color-amber-700: #cb6e17;
+	--color-amber-800: #b44d12;
+	--color-amber-900: #8d2b0b;
+
+	--color-primary: var(--color-navy-900);
+	--color-primary-light: var(--color-navy-700);
+	--color-accent: var(--color-amber-500);
+	--color-accent-hover: var(--color-amber-600);
+	--color-success: var(--color-teal-500);
+}
+
+@layer base {
+	html {
+		font-family: var(--font-sans);
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+
+	body {
+		@apply bg-white text-navy-900;
+	}
+}
+
+/* Smooth page transitions */
+.page-transition {
+	animation: fadeSlideIn 0.3s ease-out;
+}
+
+@keyframes fadeSlideIn {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes pulse-dot {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.4; }
+}
+
+.animate-pulse-dot {
+	animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+@keyframes slide-up {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.animate-slide-up {
+	opacity: 0;
+	animation: slide-up 0.4s ease-out forwards;
+}
+
+/* Driver car animation on map */
+@keyframes drive {
+	0% { transform: translate(0, 0); }
+	25% { transform: translate(30px, -15px); }
+	50% { transform: translate(60px, -5px); }
+	75% { transform: translate(40px, 10px); }
+	100% { transform: translate(0, 0); }
+}
+
+.animate-drive {
+	animation: drive 8s ease-in-out infinite;
+}
+
+/* Car animation along SVG route path (en-route: driver to airport) */
+@keyframes drive-to-airport {
+	0% { offset-distance: 0%; }
+	100% { offset-distance: 100%; }
+}
+
+.animate-drive-route {
+	offset-rotate: auto;
+	animation: drive-to-airport 6s ease-in-out infinite alternate;
+}
+
+/* Searching / matching dots animation */
+@keyframes searching-dots {
+	0%, 20% { opacity: 0; }
+	40% { opacity: 1; }
+	100% { opacity: 1; }
+}
+
+.animate-dot-1 { animation: searching-dots 1.4s infinite; animation-delay: 0s; }
+.animate-dot-2 { animation: searching-dots 1.4s infinite; animation-delay: 0.2s; }
+.animate-dot-3 { animation: searching-dots 1.4s infinite; animation-delay: 0.4s; }
+
+/* Pulsing ring animation */
+@keyframes pulse-ring {
+	0% { transform: scale(0.8); opacity: 0.8; }
+	50% { transform: scale(1.3); opacity: 0; }
+	100% { transform: scale(0.8); opacity: 0; }
+}
+
+.animate-pulse-ring {
+	animation: pulse-ring 2s ease-out infinite;
+}
+
+/* Star rating hover */
+.star-btn {
+	transition: transform 0.15s ease;
+}
+.star-btn:hover {
+	transform: scale(1.2);
+}
+.star-btn:active {
+	transform: scale(0.95);
+}
