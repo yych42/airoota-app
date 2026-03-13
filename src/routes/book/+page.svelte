@@ -333,7 +333,7 @@
 		id="step-1"
 		class="transition-all duration-500 {currentStep === 1 ? 'opacity-100' : 'pointer-events-none hidden'}"
 	>
-		<div class="space-y-6">
+		<div class="space-y-6 overflow-hidden">
 			<!-- ── Section: Airport & Flight ── -->
 			<div class="space-y-4">
 				<h2 class="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-navy-500">
@@ -372,7 +372,7 @@
 						id="date"
 						type="date"
 						bind:value={date}
-						class="w-full rounded-xl border border-navy-200 bg-white px-4 py-3.5 text-sm font-medium text-navy-900 transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none"
+						class="box-border min-w-0 max-w-full w-full rounded-xl border border-navy-200 bg-white px-4 py-3.5 text-sm font-medium text-navy-900 transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none"
 					/>
 				</div>
 				<div>
@@ -384,7 +384,7 @@
 						id="time"
 						type="time"
 						bind:value={time}
-						class="w-full rounded-xl border border-navy-200 bg-white px-4 py-3.5 text-sm font-medium text-navy-900 transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none"
+						class="box-border min-w-0 max-w-full w-full rounded-xl border border-navy-200 bg-white px-4 py-3.5 text-sm font-medium text-navy-900 transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none"
 					/>
 				</div>
 
