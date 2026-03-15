@@ -1,4 +1,8 @@
 node_modules
-.svelte-kit
-build
+.expo
+dist
 .git
+ios
+android
+*.tsbuildinfo
+.DS_Store

@@ -1,16 +1,11 @@
-FROM node:22-slim AS build
+FROM node:20-alpine AS builder
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci --force
+COPY package.json package-lock.json ./
+RUN npm ci
 COPY . .
-RUN npm run build
+RUN npx expo export -p web
 
-FROM node:22-slim
-WORKDIR /app
-COPY --from=build /app/build ./build
-COPY --from=build /app/package.json ./
-COPY --from=build /app/node_modules ./node_modules
-ENV NODE_ENV=production
-ENV PORT=3000
-EXPOSE 3000
-CMD ["node", "build"]
+FROM caddy:2-alpine
+COPY Caddyfile /etc/caddy/Caddyfile
+COPY --from=builder /app/dist /srv
+EXPOSE 8080
