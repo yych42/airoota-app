@@ -2,6 +2,7 @@ import '../global.css';
 import { useEffect } from 'react';
 import { Platform, View } from 'react-native';
 import { Stack } from 'expo-router';
+import { ThemeProvider, DefaultTheme } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { NotoSansTC_400Regular, NotoSansTC_500Medium, NotoSansTC_700Bold } from '@expo-google-fonts/noto-sans-tc';
@@ -18,6 +19,11 @@ export const unstable_settings = {
 };
 
 SplashScreen.preventAutoHideAsync();
+
+const appTheme = {
+  ...DefaultTheme,
+  colors: { ...DefaultTheme.colors, background: '#ffffff' },
+};
 
 export default function RootLayout() {
   initI18n();
@@ -48,6 +54,7 @@ export default function RootLayout() {
     <I18nProvider i18n={i18n}>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaProvider>
+          <ThemeProvider value={appTheme}>
           <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="book" options={{ presentation: 'card', animation: 'slide_from_right' }} />
@@ -55,6 +62,7 @@ export default function RootLayout() {
             <Stack.Screen name="guides" options={{ presentation: 'card', animation: 'slide_from_right' }} />
             <Stack.Screen name="help" options={{ presentation: 'card', animation: 'slide_from_right' }} />
           </Stack>
+          </ThemeProvider>
           <StatusBar style="auto" />
         </SafeAreaProvider>
       </GestureHandlerRootView>

@@ -182,8 +182,8 @@ export default function ProfileScreen() {
           </Pressable>
         </View>
 
-        {/* Bottom spacer for tab bar */}
-        <View className="pb-28" />
+        {/* Bottom spacer for floating tab bar */}
+        <View className="pb-24" />
       </Animated.View>
     </ScrollView>
   );

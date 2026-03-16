@@ -27,7 +27,7 @@ export default function TripsScreen() {
   return (
     <ScrollView
       className="flex-1 bg-white"
-      contentContainerStyle={{ paddingBottom: 32 + insets.bottom }}
+      contentContainerStyle={{ paddingBottom: 96 }}
     >
       <Animated.View style={[{ flex: 1 }, fadeIn]}>
         {/* Header */}
