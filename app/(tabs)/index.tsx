@@ -16,6 +16,7 @@ import {
 import { colors } from '../../src/theme/tokens';
 import { useFadeSlideIn } from '../../src/utils/animations';
 import { useT } from '../../src/i18n/useTranslation';
+import { StepList } from '../../src/components/ui/StepList';
 
 export default function LandingScreen() {
   const t = useT();
@@ -112,30 +113,19 @@ export default function LandingScreen() {
         <View className="mt-10 px-6">
           <Text className="mb-6 text-center text-lg font-bold text-navy-900">{t('如何預約')}</Text>
 
-          <View className="ml-5">
-            {/* Vertical connecting line */}
-            <View className="absolute left-[23px] top-5 bottom-10 w-0.5 bg-teal-200" />
-
-            {/* Step 1 */}
-            <View className="relative flex-row items-start gap-5 pb-8">
-              <View className="relative z-10 h-9 w-9 items-center justify-center rounded-full bg-teal-500">
-                <Text className="text-sm font-bold text-white">1</Text>
-              </View>
-              <View className="flex-1 pt-1">
+          <StepList
+            circleSize={36}
+            gap={20}
+            spacing={32}
+            items={[
+              <View className="pt-1">
                 <View className="flex-row items-center gap-2">
                   <CalendarClock size={18} strokeWidth={2} color={colors.teal[600]} />
                   <Text className="text-sm font-bold text-navy-900">{t('選擇機場與時間')}</Text>
                 </View>
                 <Text className="mt-1 text-xs text-navy-500">{t('輸入航班資訊與乘車時間')}</Text>
-              </View>
-            </View>
-
-            {/* Step 2 */}
-            <View className="relative flex-row items-start gap-5 pb-8">
-              <View className="relative z-10 h-9 w-9 items-center justify-center rounded-full bg-teal-500">
-                <Text className="text-sm font-bold text-white">2</Text>
-              </View>
-              <View className="flex-1 pt-1">
+              </View>,
+              <View className="pt-1">
                 <View className="flex-row items-center gap-2">
                   <Car size={18} strokeWidth={2} color={colors.teal[600]} />
                   <Text className="text-sm font-bold text-navy-900">{t('確認車型與價格')}</Text>
@@ -143,15 +133,8 @@ export default function LandingScreen() {
                 <Text className="mt-1 text-xs text-navy-500">
                   {t('選擇適合的車型，價格透明')}
                 </Text>
-              </View>
-            </View>
-
-            {/* Step 3 */}
-            <View className="relative flex-row items-start gap-5">
-              <View className="relative z-10 h-9 w-9 items-center justify-center rounded-full bg-teal-500">
-                <Text className="text-sm font-bold text-white">3</Text>
-              </View>
-              <View className="flex-1 pt-1">
+              </View>,
+              <View className="pt-1">
                 <View className="flex-row items-center gap-2">
                   <MapPinCheck size={18} strokeWidth={2} color={colors.teal[600]} />
                   <Text className="text-sm font-bold text-navy-900">{t('安心出發')}</Text>
@@ -159,9 +142,9 @@ export default function LandingScreen() {
                 <Text className="mt-1 text-xs text-navy-500">
                   {t('司機準時抵達，享受舒適旅程')}
                 </Text>
-              </View>
-            </View>
-          </View>
+              </View>,
+            ]}
+          />
         </View>
 
         {/* Bottom spacer for floating tab bar */}

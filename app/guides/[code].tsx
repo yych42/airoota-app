@@ -16,6 +16,7 @@ import { colors } from '../../src/theme/tokens';
 import { airportGuides } from '../../src/data/airports';
 import { useFadeSlideIn } from '../../src/utils/animations';
 import { useT } from '../../src/i18n/useTranslation';
+import { StepList } from '../../src/components/ui/StepList';
 
 export default function GuideDetailScreen() {
   const { code } = useLocalSearchParams<{ code: string }>();
@@ -107,28 +108,17 @@ export default function GuideDetailScreen() {
 
               {openSections['meetDriver'] && (
                 <View className="px-5 pb-5">
-                  {/* Step cards with vertical connecting line */}
-                  <View className="relative ml-4">
-                    <View className="absolute left-[14px] top-4 bottom-4 w-0.5 bg-teal-200" />
-
-                    {guide.steps.map((step, i) => (
-                      <View
-                        key={i}
-                        className={`relative flex-row items-start gap-4 ${
-                          i < guide.steps.length - 1 ? 'pb-6' : ''
-                        }`}
-                      >
-                        <View className="relative z-10 h-7 w-7 items-center justify-center rounded-full bg-teal-500">
-                          <Text className="text-xs font-bold text-white">{i + 1}</Text>
-                        </View>
-                        <View className="flex-1 pt-0.5">
+                  <View className="ml-4">
+                    <StepList
+                      items={guide.steps.map((step, i) => (
+                        <View key={i} className="pt-0.5">
                           <Text className="text-sm font-bold text-navy-900">{step.title}</Text>
                           <Text className="mt-1 text-xs leading-relaxed text-navy-500">
                             {step.desc}
                           </Text>
                         </View>
-                      </View>
-                    ))}
+                      ))}
+                    />
                   </View>
 
                   {/* Free wait time banner */}
